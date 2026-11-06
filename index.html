@@ -158,7 +158,7 @@ function restore(e){
  if(file.size>5*1024*1024){toast('حجم النسخة أكبر من الحد المسموح (5 MB)');e.target.value='';return}
  const reader=new FileReader();reader.onload=()=>{try{const imported=JSON.parse(reader.result);if(!validDatabase(imported))throw new Error('invalid schema');if(!confirm('سيتم استبدال البيانات الحالية بالنسخة المختارة. هل تريد المتابعة؟'))return;const previous=db;db=imported;if(!save()){db=previous;return}showPage('backup');toast('تم استرجاع البيانات بنجاح')}catch(_){toast('ملف النسخة غير صالح أو غير مكتمل')}finally{e.target.value=''}};reader.onerror=()=>{toast('تعذر قراءة ملف النسخة');e.target.value=''};reader.readAsText(file);
 }
-function exportCSV(){let rows=[['البيت','المصروف','المستلم','النتيجة'],...db.houses.map(h=>[h.name,h.expense,h.received,h.received-h.expense])],csv='\ufeff'+rows.map(r=>r.join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='contractor-report.csv';a.click()}
+function exportCSV(){let rows=[['البيت','المصروف','المستلم','النتيجة'],...db.houses.map(h=>[h.name,h.expense,h.received,h.received-h.expense])],cell=v=>{let s=String(v??'');if(/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'},csv='\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='contractor-report.csv';a.click()}
 function searchTable(q){q=q.trim().toLowerCase();document.querySelectorAll('tbody tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(q)?'':'none')}
 renderHome();animateCounters();
 </script>
